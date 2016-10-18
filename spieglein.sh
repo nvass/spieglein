@@ -27,7 +27,7 @@ do
 		awk '/@/ { split($1, s, /@/); print s[2] }'
 	`
 
-	[ -n "$verbose" ] && echo "($f) all local snapshots:" `echo $destination_snaps_array` 1>&2
+	[ -n "$verbose" ] && echo "($f) local snapshots:" `echo "$destination_snaps_array" | sed '11{ s/.*/.../; q; }'` 1>&2
 	for destination_snap in $destination_snaps_array; do
 		[ -n "$verbose" ] && echo "($f) checking snapshot $destination_snap" 1>&2
 
@@ -101,6 +101,7 @@ do
 	else
 		temp_command='ssh $ssh_params $ssh_user@$ssh_host "zfs send $send_params $recursion_send $incremental $source@$source_snap | $compress $compress_params" | $decompress $decompress_params | zfs recv $recv_params $destination'
 	fi
+	[ -n "$verbose" ] && echo "($f) executing:" $temp_command
 	eval $temp_command
 done
 TRALARI
