@@ -3,6 +3,7 @@
 backup() {
 	thejob=`eval echo \\$${job}`
 
+	export job
 	export thejob
 
 	eval $lockf $lockf_params <<'TRALARI'
@@ -27,9 +28,9 @@ do
 		awk '/@/ { split($1, s, /@/); print s[2] }'
 	`
 
-	[ -n "$verbose" ] && echo "($f) local snapshots:" `echo "$destination_snaps_array" | sed '11{ s/.*/.../; q; }'` 1>&2
+	[ -n "$verbose" ] && echo "($job:$f) local snapshots:" `echo "$destination_snaps_array" | sed '11{ s/.*/.../; q; }'` 1>&2
 	for destination_snap in $destination_snaps_array; do
-		[ -n "$verbose" ] && echo "($f) checking snapshot $destination_snap" 1>&2
+		[ -n "$verbose" ] && echo "($job:$f) checking snapshot $destination_snap" 1>&2
 
 		destination_snaps=`
 			zfs list -H -t snapshot -S name $recursion_list $destination |
@@ -44,7 +45,7 @@ do
 		`
 
 		if [ "$destination_snaps" = "$source_snaps" ]; then
-			[ -n "$verbose" ] && echo "($f) same snapshots found: $destination_snap" 1>&2
+			[ -n "$verbose" ] && echo "($job:$f) same snapshots found: $destination_snap" 1>&2
 			break
 		fi
 
@@ -54,7 +55,7 @@ do
 			`" | cat -n
 		)
 		if [ -z "$temp_command" ]; then
-			echo "($f) WARNING: More datasets in backup. It seems that some datasets are deleted" 1>&2
+			echo "($job:$f) WARNING: More datasets in backup. It seems that some datasets are deleted" 1>&2
 			break
 		fi
 
@@ -74,13 +75,13 @@ do
 	fi
 
 	if [ -z "$source_snap" ]; then
-		echo "($f) WARNING: $ssh_host:$source contains no snapshots. Nothing copied" 1>&2
+		echo "($job:$f) WARNING: $ssh_host:$source contains no snapshots. Nothing copied" 1>&2
 		continue
 	fi
 
 	if [ "$destination_snap" = "$source_snap" ]; then
 		[ -n "$verbose" ] && {
-			echo "($f) no newer snap. Nothing to copy"
+			echo "($job:$f) no newer snap. Nothing to copy"
 		} 1>&2
 		continue
 	fi
@@ -101,7 +102,7 @@ do
 	else
 		temp_command='ssh $ssh_params $ssh_user@$ssh_host "zfs send $send_params $recursion_send $incremental $source@$source_snap | $compress $compress_params" | $decompress $decompress_params | zfs recv $recv_params $destination'
 	fi
-	[ -n "$verbose" ] && echo "($f) executing:" $temp_command
+	[ -n "$verbose" ] && echo "($job:$f) executing:" $temp_command
 	eval $temp_command
 done
 TRALARI
