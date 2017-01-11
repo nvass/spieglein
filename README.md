@@ -30,7 +30,6 @@ Configuration can be split in many files so users can run several instances of s
 
 
 
-<<<<<<< HEAD
 =======
 
 The actual commands used are:
@@ -40,4 +39,3 @@ zfs list
 zfs send
 
 zfs receive
->>>>>>> 927d7280a3e0d6a7049f6228d25c35abe34ce03a
