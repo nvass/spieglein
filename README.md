@@ -30,23 +30,3 @@ Configuration can be split in many files so users can run several instances of s
 
 
 
-
-What spieglein does not do:
-
-ZFS snapshots. Users should deploy their own snapshot-managing solution. A simplistic sample script is provided though.
-
-It does not automate ZFS pool creation/import etc.
-
-It does not set ZFS properties.
-
-It does not copy your SSH key for you.
-
-It does not create any disk partitions.
-
-The actual commands used are:
-
-zfs list
-
-zfs send
-
-zfs receive
