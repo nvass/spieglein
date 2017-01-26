@@ -5,8 +5,6 @@ It is based on the ZFS snapshot idea where a recursive snapshot is considered to
 
 Features that might be added later:
 
-Log file per job
-
 Pre and post backup command
 
 Sudo support
