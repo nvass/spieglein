@@ -24,7 +24,7 @@ do
 	fi
 
 	destination_snaps_array=`
-		zfs list -H -t snapshot -S creation -o name -rd1 $destination |
+		$sudo_local zfs list -H -t snapshot -S creation -o name -rd1 $destination |
 		awk '/@/ { split($1, s, /@/); print s[2] }'
 	`
 
@@ -33,13 +33,13 @@ do
 		[ -n "$verbose" ] && echo "($job:$f) checking snapshot $destination_snap" 1>&2
 
 		destination_snaps=`
-			zfs list -H -t snapshot -S name $recursion_list $destination |
+			$sudo_local zfs list -H -t snapshot -S name $recursion_list $destination |
 			fgrep $destination_snap | awk '{ print $1 }' |
 			sed "s|^$destination||"
 		`
 
 		source_snaps=`
-			ssh $ssh_params $ssh_user@$ssh_host zfs list -H -t snapshot -S name $recursion_list $source |
+			ssh $ssh_params $ssh_user@$ssh_host $sudo_remote zfs list -H -t snapshot -S name $recursion_list $source |
 			fgrep $destination_snap | awk '{ print $1 }' |
 			sed "s|^$source||"
 		`
@@ -63,12 +63,12 @@ do
 
 	if [ -z "$filter" ]; then
 		source_snap=`
-			ssh $ssh_params $ssh_user@$ssh_host zfs list -H -t snapshot -s creation -rd1 $source |
+			ssh $ssh_params $ssh_user@$ssh_host $sudo_remote zfs list -H -t snapshot -s creation -rd1 $source |
 			awk 'END { split($1, s, /@/); print s[2] }'
 		`
 	else
 		source_snap=`
-			ssh $ssh_params $ssh_user@$ssh_host zfs list -H -t snapshot -s creation -rd1 $source |
+			ssh $ssh_params $ssh_user@$ssh_host $sudo_remote zfs list -H -t snapshot -s creation -rd1 $source |
 			$filter $filter_params |
 			awk 'END { split($1, s, /@/); print s[2] }'
 		`
@@ -98,9 +98,9 @@ do
 	fi
 
 	if [ -z "$compress" ]; then
-		temp_command='ssh $ssh_params $ssh_user@$ssh_host "zfs send $send_params $recursion_send $incremental $source@$source_snap" | zfs recv $recv_params $destination'
+		temp_command='ssh $ssh_params $ssh_user@$ssh_host "$sudo_remote zfs send $send_params $recursion_send $incremental $source@$source_snap" | $sudo_local zfs recv $recv_params $destination'
 	else
-		temp_command='ssh $ssh_params $ssh_user@$ssh_host "zfs send $send_params $recursion_send $incremental $source@$source_snap | $compress $compress_params" | $decompress $decompress_params | zfs recv $recv_params $destination'
+		temp_command='ssh $ssh_params $ssh_user@$ssh_host "$sudo_remote zfs send $send_params $recursion_send $incremental $source@$source_snap | $compress $compress_params" | $decompress $decompress_params | $sudo_local zfs recv $recv_params $destination'
 	fi
 	[ -n "$verbose" ] && echo "($job:$f) executing:" $temp_command
 	eval $temp_command
