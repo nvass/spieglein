@@ -98,9 +98,11 @@ do
 	fi
 
 	if [ -z "$compress" ]; then
-		temp_command='ssh $ssh_params $ssh_user@$ssh_host "$sudo_remote zfs send $send_params $recursion_send $incremental $source@$source_snap" | $sudo_local zfs recv $recv_params $destination'
+		temp_command='ssh $ssh_params $ssh_user@$ssh_host "$sudo_remote zfs send $send_params $recursion_send $incremental $source@$source_snap" |
+		  $sudo_local zfs recv $recv_nomount_param $recv_params $destination'
 	else
-		temp_command='ssh $ssh_params $ssh_user@$ssh_host "$sudo_remote zfs send $send_params $recursion_send $incremental $source@$source_snap | $compress $compress_params" | $decompress $decompress_params | $sudo_local zfs recv $recv_params $destination'
+		temp_command='ssh $ssh_params $ssh_user@$ssh_host "$sudo_remote zfs send $send_params $recursion_send $incremental $source@$source_snap |
+		  $compress $compress_params" | $decompress $decompress_params | $sudo_local zfs recv $recv_nomount_param $recv_params $destination'
 	fi
 	[ -n "$verbose" ] && echo "($job:$f) executing:" $temp_command
 	eval $temp_command
