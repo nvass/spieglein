@@ -5,11 +5,9 @@ It is based on the ZFS snapshot idea where a recursive snapshot is considered to
 
 Features that might be added later:
 
-Pre and post backup command
-
-Sudo support
-
-Bandwidth throttling and data buffering
+Pre and post backup command.
+Automatic creation of parent datasets that don't exist.
+Bandwidth throttling and data buffering.
 
 
 
