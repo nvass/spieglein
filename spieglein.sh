@@ -29,6 +29,7 @@ do
 	`
 
 	[ -n "$verbose" ] && echo "($job:$f) local snapshots:" `echo "$destination_snaps_array" | sed '11{ s/.*/.../; q; }'` 1>&2
+	unset destination_snap
 	for destination_snap in $destination_snaps_array; do
 		[ -n "$verbose" ] && echo "($job:$f) checking snapshot $destination_snap" 1>&2
 
