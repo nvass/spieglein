@@ -34,14 +34,14 @@ do
 		[ -n "$verbose" ] && echo "($job:$f) checking snapshot $destination_snap" 1>&2
 
 		destination_snaps=`
-			$sudo_local zfs list -H -t snapshot -S name $recursion_list $destination |
-			fgrep $destination_snap | awk '{ print $1 }' |
+			$sudo_local zfs list -H -t snapshot -S name -o name $recursion_list $destination |
+			awk '{ split($1, s, /@/); if (s[2] == "'$destination_snap'") print $1 }' |
 			sed "s|^$destination||"
 		`
 
 		source_snaps=`
-			ssh $ssh_params $ssh_user@$ssh_host $sudo_remote zfs list -H -t snapshot -S name $recursion_list $source |
-			fgrep $destination_snap | awk '{ print $1 }' |
+			ssh $ssh_params $ssh_user@$ssh_host $sudo_remote zfs list -H -t snapshot -S name -o name $recursion_list $source |
+			awk '{ split($1, s, /@/); if (s[2] == "'$destination_snap'") print $1 }' |
 			sed "s|^$source||"
 		`
 
@@ -105,8 +105,9 @@ do
 		temp_command='ssh $ssh_params $ssh_user@$ssh_host "$sudo_remote zfs send $send_params $recursion_send $incremental $source@$source_snap |
 		  $compress $compress_params" | $decompress $decompress_params | $sudo_local zfs recv $recv_nomount_param $recv_params $destination'
 	fi
-	[ -n "$verbose" ] && echo "($job:$f) executing:" $temp_command
+	[ -n "$verbose" ] && { echo "($job:$f) executing:"; set -x; }
 	eval $temp_command
+	[ -n "$verbose" ] && set +x
 done
 TRALARI
 }
