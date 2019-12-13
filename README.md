@@ -4,10 +4,9 @@ Spieglein is a small tool to backup ZFS-based systems to a central backup server
 It is based on the ZFS snapshot idea where a recursive snapshot is considered to be a consistent point in time that the administrator wants to back up. It always tries to use the latest snapshot found in the backup server and copy differentially to the latest snapshot found in the system-to-be backed up. If local and remote snapshots are found to differ (due to an incomplete backup for example) then it tries to use the snapshot just before the latest. This procedure goes on until a common snapshot which can be copied is found on both systems. Spieglein copies everything recursively and this can be changed explicitly per job definition.
 
 Features that might be added later:
-
-Pre and post backup command.
-Automatic creation of parent datasets that don't exist.
-Bandwidth throttling and data buffering.
+- Pre and post backup command.
+- Automatic creation of parent datasets that don't exist.
+- Bandwidth throttling and data buffering.
 
 
 
@@ -30,8 +29,8 @@ Configuration can be split in many files so users can run several instances of s
 
 The actual commands used are:
 
-zfs list
+- zfs list
 
-zfs send
+- zfs send
 
-zfs receive
+- zfs receive
